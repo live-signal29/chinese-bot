@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Signals Chinese Bot - Professional Trading</title>
-    <!-- Tailwind CSS CDN for styling -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -42,7 +42,7 @@
     <main class="flex-grow flex items-center justify-center px-4 py-10">
         <div class="w-full max-w-md">
 
-            <!-- State 1: License Activation Card (Jaisa image me hai) -->
+            <!-- Activation Card -->
             <div id="activationView" class="glass-card rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                 <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
                 
@@ -54,48 +54,48 @@
                 </div>
 
                 <div class="text-center mb-6">
-                    <h1 class="text-2xl font-bold text-white mb-1">Live Signals Chinese Bot[span_1](start_span)[span_1](end_span)</h1>
+                    <h1 class="text-2xl font-bold text-white mb-1">Live Signals Chinese Bot</h1>
                     <p class="text-slate-400 text-sm">Automated premium trading signals</p>
                 </div>
 
-                <!-- Features Pill -->
+                <!-- Features -->
                 <div class="flex flex-col gap-2.5 mb-6">
                     <div class="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-slate-800/80 border border-slate-700/50 text-xs text-slate-300 font-medium">
-                        <i class="fa-solid fa-bolt text-emerald-400"></i> Instant key delivery[span_2](start_span)[span_2](end_span)
+                        <i class="fa-solid fa-bolt text-emerald-400"></i> Instant key delivery
                     </div>
                     <div class="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-slate-800/80 border border-slate-700/50 text-xs text-slate-300 font-medium">
-                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Verified payments[span_3](start_span)[span_3](end_span)
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Verified payments
                     </div>
                 </div>
 
-                <!-- License Key Form -->
+                <!-- Key Input Form -->
                 <div class="glass-card p-5 rounded-2xl border border-slate-700/60 mb-6 bg-slate-900/40">
                     <label class="block text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-key text-emerald-400"></i> Enter License Key[span_4](start_span)[span_4](end_span)
+                        <i class="fa-solid fa-key text-emerald-400"></i> Enter License Key
                     </label>
                     <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX" 
                         class="w-full bg-slate-950/60 border border-slate-700/80 rounded-xl px-4 py-3 text-center text-sm font-mono tracking-widest text-emerald-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-all mb-4">
                     
                     <button onclick="activateBot()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 text-sm">
-                        <i class="fa-solid fa-paper-plane"></i> Activate Bot[span_5](start_span)[span_5](end_span)
+                        <i class="fa-solid fa-paper-plane"></i> Activate Bot
                     </button>
                 </div>
 
-                <!-- Footer Links Inside Card -->
+                <!-- Footer Links -->
                 <div class="border-t border-slate-800/80 pt-4 text-center">
-                    <p class="text-xs text-slate-500 mb-3">Don't have a key?[span_6](start_span)[span_6](end_span)</p>
+                    <p class="text-xs text-slate-500 mb-3">Don't have a key?</p>
                     <div class="flex flex-col gap-2.5">
                         <a href="https://t.me/" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 text-xs font-semibold text-emerald-400 transition flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-telegram text-base"></i> Get License Key DM on Telegram[span_7](start_span)[span_7](end_span)
+                            <i class="fa-brands fa-telegram text-base"></i> Get License Key DM on Telegram
                         </a>
                         <button onclick="alert('Redirecting to payment gateway... ($30)')" class="w-full py-3 px-4 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-bold text-emerald-300 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cart-shopping"></i> Buy License Key <span class="bg-emerald-500/20 px-2 py-0.5 rounded text-[10px]">from $30</span>[span_8](start_span)[span_8](end_span)
+                            <i class="fa-solid fa-cart-shopping"></i> Buy License Key <span class="bg-emerald-500/20 px-2 py-0.5 rounded text-[10px]">from $30</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- State 2: Live Signal Generator Dashboard (Key enter hone ke baad dikhega) -->
+            <!-- Signal Generator Dashboard -->
             <div id="dashboardView" class="hidden glass-card rounded-3xl p-6 shadow-2xl relative">
                 <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                     <div>
@@ -109,7 +109,7 @@
                     </button>
                 </div>
 
-                <!-- Timeframe Selection Tabs -->
+                <!-- Timeframe Tabs -->
                 <div class="grid grid-cols-3 gap-2 mb-6">
                     <button onclick="changeTimeframe(30, this)" class="tf-btn py-2 text-xs font-semibold rounded-xl bg-emerald-500 text-slate-950 transition shadow-md">30 Sec</button>
                     <button onclick="changeTimeframe(15, this)" class="tf-btn py-2 text-xs font-semibold rounded-xl bg-slate-800 text-slate-400 hover:bg-slate-700 transition">15 Sec</button>
@@ -131,11 +131,10 @@
                     </div>
                 </div>
 
-                <!-- Recent Signals History Log -->
+                <!-- Signal History Log -->
                 <div>
                     <h3 class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Recent Signals Log</h3>
                     <div id="signalLog" class="space-y-2 max-h-36 overflow-y-auto pr-1 text-xs">
-                        <!-- Dynamic Logs will appear here -->
                     </div>
                 </div>
             </div>
@@ -143,16 +142,16 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer class="w-full py-4 text-center border-t border-slate-800/80 bg-slate-900/30 text-xs text-slate-500">
         <p>&copy; 2026 Chinese Bot Trading Systems. All rights reserved.</p>
         <p class="mt-1 text-[10px] text-slate-600">Disclaimer: Trading binary options / Forex involves high risk.</p>
     </footer>
 
-    <!-- JavaScript for Auto Signal Generation Logic -->
+    <!-- JavaScript -->
     <script>
         let signalTimer = null;
-        let currentTimeframe = 30; // Default 30 seconds
+        let currentTimeframe = 30;
         let countdownInterval = null;
         let timeLeft = 30;
 
@@ -165,11 +164,9 @@
                 return;
             }
 
-            // Hide Activation and Show Dashboard
             document.getElementById('activationView').classList.add('hidden');
             document.getElementById('dashboardView').classList.remove('hidden');
 
-            // Start Signal Generator
             startSignalGenerator();
         }
 
@@ -185,7 +182,6 @@
             currentTimeframe = seconds;
             timeLeft = seconds;
             
-            // Update button UI styles
             document.querySelectorAll('.tf-btn').forEach(btn => {
                 btn.classList.remove('bg-emerald-500', 'text-slate-950', 'shadow-md');
                 btn.classList.add('bg-slate-800', 'text-slate-400');
@@ -193,7 +189,6 @@
             btnElement.classList.remove('bg-slate-800', 'text-slate-400');
             btnElement.classList.add('bg-emerald-500', 'text-slate-950', 'shadow-md');
 
-            // Restart generator with new timeframe
             clearInterval(signalTimer);
             clearInterval(countdownInterval);
             startSignalGenerator();
@@ -203,7 +198,6 @@
             timeLeft = currentTimeframe;
             generateNewSignal();
 
-            // Countdown timer loop
             countdownInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById('countdownBadge').innerText = `Next in: ${timeLeft}s`;
@@ -232,7 +226,6 @@
                 outputEl.innerHTML = `<i class="fa-solid fa-arrow-trend-down"></i> ${chosenSignal}`;
             }
 
-            // Add to log
             const now = new Date().toLocaleTimeString();
             const logContainer = document.getElementById('signalLog');
             const logItem = document.createElement('div');
@@ -244,7 +237,6 @@
             `;
             logContainer.prepend(logItem);
 
-            // Limit log items
             if(logContainer.children.length > 5) {
                 logContainer.lastChild.remove();
             }
