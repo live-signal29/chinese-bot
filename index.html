@@ -84,8 +84,10 @@
                     <label class="block text-[11px] font-bold text-slate-300 mb-2 flex items-center gap-1.5">
                         <i class="fa-solid fa-key text-emerald-400"></i> Enter License Key
                     </label>
-                    <input type="text" id="licenseKeyInput" placeholder="ENTER-KEY-HERE" 
-                        class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-center text-xs font-mono tracking-wider text-emerald-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all mb-2">
+                    
+                    <!-- Auto-Formatting Input Field -->
+                    <input type="text" id="licenseKeyInput" placeholder="V8UP-6NNA-2W2V-T87X" maxlength="19" oninput="formatLicenseKey(this)"
+                        class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-center text-xs font-mono tracking-widest text-emerald-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all mb-2">
                     
                     <!-- Error Message Display -->
                     <div id="errorMsg" class="text-[10px] text-rose-400 text-center mb-3 hidden font-semibold">
@@ -194,10 +196,9 @@
     <script>
         // 👉 APNI VALID LICENSE KEYS YAHAN ADD KAREIN (Aap jitni chahein keys rakh sakte hain)
         const VALID_KEYS = [
-            "CHINESE-VIP-2026",
-            "AZIZ-TRADER-999",
-            "QUEEN-BOT-SUPPORT",
-            "PRO-SIGNAL-777"
+            "V8UP-6NNA-2W2V-T87X",
+            "AZIZ-7779-9921-ABCD",
+            "QUEEN-VIP1-2026-X9Z8"
         ];
 
         let currentTimeframe = 30;
@@ -205,17 +206,29 @@
         let timeLeft = 30;
         let isAnalyzing = false;
 
+        // Auto-format function for license key (XXXX-XXXX-XXXX-XXXX)
+        function formatLicenseKey(input) {
+            let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length && i < 16; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += '-';
+                }
+                formattedValue += value[i];
+            }
+            input.value = formattedValue;
+        }
+
         function activateBot() {
             const inputKey = document.getElementById('licenseKeyInput').value.trim();
             const errorMsg = document.getElementById('errorMsg');
 
-            // Check if key is valid
             if (VALID_KEYS.includes(inputKey)) {
                 errorMsg.classList.add('hidden');
                 document.getElementById('activationView').classList.add('hidden');
                 document.getElementById('dashboardView').classList.remove('hidden');
             } else {
-                // Show Error Message if key is wrong
                 errorMsg.classList.remove('hidden');
                 document.getElementById('licenseKeyInput').classList.add('border-rose-500');
                 setTimeout(() => {
