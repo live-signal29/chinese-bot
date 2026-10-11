@@ -194,7 +194,6 @@
 
     <!-- Secure Script Logic -->
     <script>
-        // 👉 APNI VALID LICENSE KEYS YAHAN ADD KAREIN (Aap jitni chahein keys rakh sakte hain)
         const VALID_KEYS = [
             "V8UP-6NNA-2W2V-T87X",
             "AZIZ-7779-9921-ABCD",
@@ -206,7 +205,6 @@
         let timeLeft = 30;
         let isAnalyzing = false;
 
-        // Auto-format function for license key (XXXX-XXXX-XXXX-XXXX)
         function formatLicenseKey(input) {
             let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             let formattedValue = '';
@@ -277,6 +275,7 @@
 
             clearInterval(countdownInterval);
 
+            // 10 Seconds scanning delay (10000 ms)
             setTimeout(() => {
                 const types = ['CALL (UP)', 'PUT (DOWN)'];
                 const chosenSignal = types[Math.floor(Math.random() * types.length)];
@@ -323,7 +322,7 @@
                 isAnalyzing = false;
                 getBtn.disabled = false;
                 getBtn.classList.remove('opacity-50');
-            }, 1200);
+            }, 10000); // <-- Yahan 10 seconds set kar diya gaya hai
         }
     </script>
 </body>
