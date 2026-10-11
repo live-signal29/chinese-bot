@@ -341,52 +341,118 @@
             el.className = (ok ? 'text-emerald-400' : 'text-amber-400') + ' font-normal';
         }
 
+        // Deriv public endpoint (the old ws.derivws.com / app_id=1089 one was retired).
+        const DERIV_WS = 'wss://api.derivws.com/trading/v1/options/ws/public';
+        // Backup feed for crypto if Deriv is unreachable on this network.
+        const BINANCE = { cryBTCUSD: 'BTCUSDT', cryETHUSD: 'ETHUSDT' };
+        let source = 'deriv', derivFails = 0, binWs = null, lastPush = 0, helloTimer = null;
+
+        function closeSockets() {
+            clearTimeout(helloTimer);
+            if (ws) { ws.onclose = null; try { ws.close(); } catch (e) {} ws = null; }
+            if (binWs) { binWs.onclose = null; try { binWs.close(); } catch (e) {} binWs = null; }
+            feedOpen = false;
+        }
+
+        function resetFeedState() {
+            ticks = []; lastTickAt = 0; lastPush = 0; $('livePrice').innerText = '--';
+            source = 'deriv'; derivFails = 0; pipDigits = 5;
+            clearTimeout(reconnectTimer); closeSockets();
+        }
+
         function initFeed() {
             dashVisible = true;
-            $('assetSelect').onchange = () => { $('displayAsset').innerText = symLabel(); subscribeSymbol(); };
+            $('assetSelect').onchange = () => {
+                $('displayAsset').innerText = symLabel();
+                resetFeedState(); connectFeed();
+            };
             $('displayAsset').innerText = symLabel();
-            connectFeed();
+            resetFeedState(); connectFeed();
         }
 
         function stopFeed() {
             dashVisible = false;
             clearTimeout(reconnectTimer);
-            if (ws) { ws.onclose = null; try { ws.close(); } catch (e) {} ws = null; }
-            feedOpen = false;
+            closeSockets();
         }
 
         function connectFeed() {
-            if (ws) return;
+            if (ws || binWs || !dashVisible) return;
+            if (source === 'binance' && BINANCE[sym()]) connectBinance(); else { source = 'deriv'; connectDeriv(); }
+        }
+
+        function derivFailed() {
+            closeSockets();
+            derivFails++;
+            if (!dashVisible) return;
+            if (derivFails >= 2 && BINANCE[sym()]) { source = 'binance'; connectFeed(); return; }
+            setFeedStatus('Reconnecting…', false);
+            reconnectTimer = setTimeout(connectFeed, 2000);
+        }
+
+        function connectDeriv() {
             setFeedStatus('Connecting…', false);
-            ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
-            ws.onopen = () => { feedOpen = true; subscribeSymbol(); };
-            ws.onmessage = (ev) => {
+            let sock;
+            try { sock = new WebSocket(DERIV_WS); } catch (e) { derivFailed(); return; }
+            ws = sock;
+            // if nothing useful arrives in 8s, treat as failed
+            helloTimer = setTimeout(() => { if (ws === sock && !ticks.length) derivFailed(); }, 8000);
+            sock.onopen = () => {
+                feedOpen = true;
+                sock.send(JSON.stringify({ ticks_history: sym(), adjust_start_time: 1, count: 300, end: 'latest', style: 'ticks', subscribe: 1 }));
+            };
+            sock.onmessage = (ev) => {
                 let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
-                if (m.error) { setFeedStatus(m.error.message || 'Feed error', false); return; }
+                if (m.error) { setFeedStatus((m.error.message || 'Feed error').slice(0, 40), false); return; }
                 if (m.msg_type === 'history' && m.echo_req && m.echo_req.ticks_history === sym()) {
                     if (m.pip_size) pipDigits = Math.max(0, Math.round(-Math.log10(m.pip_size)));
                     ticks = m.history.times.map((t, i) => ({ t: t, p: Number(m.history.prices[i]) }));
-                    setFeedStatus('Live', true);
+                    derivFails = 0; setFeedStatus('Live', true);
                 } else if (m.msg_type === 'tick' && m.tick && m.tick.symbol === sym()) {
                     ticks.push({ t: m.tick.epoch, p: Number(m.tick.quote) });
                     if (ticks.length > 600) ticks.shift();
                     lastTickAt = Date.now();
                     $('livePrice').innerText = fmtP(m.tick.quote);
-                    setFeedStatus('Live', true);
+                    derivFails = 0; setFeedStatus('Live', true);
                 }
             };
-            ws.onclose = () => {
-                ws = null; feedOpen = false;
-                if (dashVisible) { setFeedStatus('Reconnecting…', false); reconnectTimer = setTimeout(connectFeed, 2000); }
-            };
-            ws.onerror = () => { try { ws.close(); } catch (e) {} };
+            sock.onclose = () => { if (ws === sock) derivFailed(); };
+            sock.onerror = () => { try { sock.close(); } catch (e) {} };
         }
 
-        function subscribeSymbol() {
-            ticks = []; lastTickAt = 0; $('livePrice').innerText = '--';
-            if (!ws || ws.readyState !== 1) return;
-            ws.send(JSON.stringify({ forget_all: 'ticks' }));
-            ws.send(JSON.stringify({ ticks_history: sym(), adjust_start_time: 1, count: 300, end: 'latest', style: 'ticks', subscribe: 1 }));
+        function connectBinance() {
+            const mySym = sym(), b = BINANCE[mySym];
+            setFeedStatus('Connecting (backup)…', false);
+            pipDigits = 2;
+            fetch('https://api.binance.com/api/v3/klines?symbol=' + b + '&interval=1s&limit=120')
+                .then(r => r.json())
+                .then(k => {
+                    if (sym() !== mySym || source !== 'binance' || !Array.isArray(k) || !k.length) return;
+                    const hist = k.map(x => ({ t: Math.floor(x[0] / 1000), p: Number(x[4]) }));
+                    const lastT = hist[hist.length - 1].t;
+                    ticks = hist.concat(ticks.filter(x => x.t > lastT));
+                }).catch(() => {});
+            let sock;
+            try { sock = new WebSocket('wss://stream.binance.com:9443/ws/' + b.toLowerCase() + '@trade'); } catch (e) { return; }
+            binWs = sock;
+            sock.onopen = () => { feedOpen = true; setFeedStatus('Live (backup feed)', true); };
+            sock.onmessage = (ev) => {
+                let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+                if (!m.p) return;
+                const now = Date.now();
+                lastTickAt = now;
+                $('livePrice').innerText = fmtP(m.p);
+                if (now - lastPush < 1000) return; // keep ~1 tick per second
+                lastPush = now;
+                ticks.push({ t: Math.floor(now / 1000), p: Number(m.p) });
+                if (ticks.length > 600) ticks.shift();
+            };
+            sock.onclose = () => {
+                if (binWs !== sock) return;
+                binWs = null; feedOpen = false;
+                if (dashVisible) { setFeedStatus('Reconnecting…', false); reconnectTimer = setTimeout(connectFeed, 2000); }
+            };
+            sock.onerror = () => { try { sock.close(); } catch (e) {} };
         }
 
         // ---------- Analysis on real ticks ----------
@@ -438,9 +504,9 @@
             $('displayAsset').innerText = symLabel();
 
             if (!feedOpen || !lastTickAt || Date.now() - lastTickAt > 15000) {
-                paintOutput('<i class="fa-solid fa-circle-exclamation"></i> NO LIVE PRICE', 'text-lg font-extrabold my-2 text-amber-400');
+                paintOutput('<i class="fa-solid fa-circle-exclamation"></i> NO LIVE PRICE<div class="text-[10px] font-medium text-slate-400 mt-1">Feed is connecting or the market is closed. Try BTC/USD or Volatility 100 (24/7).</div>', 'text-lg font-extrabold my-2 text-amber-400');
                 $('trendVal').innerText = '--'; $('confidenceVal').innerText = '--';
-                $('countdownBadge').innerText = 'Market closed / feed offline. Try BTC/USD or Volatility 100 (24/7).';
+                $('countdownBadge').innerText = 'Feed offline';
                 return;
             }
 
